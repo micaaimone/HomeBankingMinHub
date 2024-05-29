@@ -12,5 +12,7 @@ namespace HomeBankingMinHub.Models
         //dbsets
         //representa la tabla de base de datos con objetos de tipo client
         public DbSet<Client> Clientes { get; set; }
+
+        public DbSet<Account> Accounts { get; set; }
     }
 }

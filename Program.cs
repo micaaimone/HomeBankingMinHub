@@ -1,4 +1,5 @@
 using HomeBankingMinHub.Models;
+using HomeBankingMinHub.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -13,7 +14,11 @@ builder.Services.AddDbContext<HomeBankingContext>(
     );
 //con esto mi app ya esta conectada con mi base de datos 
 
-    var app = builder.Build();
+//agrego un contexto
+builder.Services.AddScoped<IClientRepository, ClientRepository>();
+
+
+var app = builder.Build();
 
 using (var scope = app.Services.CreateScope())
 {
@@ -38,6 +43,8 @@ if (!app.Environment.IsDevelopment())
 app.UseStaticFiles();
 
 app.UseRouting();
+
+app.MapControllers();
 
 app.UseAuthorization();
 
