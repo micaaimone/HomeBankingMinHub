@@ -30,7 +30,23 @@
                     context.Accounts.AddRange(juanAccounts);
                     context.SaveChanges();
                 }
-                
+            }
+
+            if (!context.Transactions.Any())
+            {
+                var account1 = context.Accounts.FirstOrDefault(c => c.Number == "VIN001");
+                if (account1 != null)
+                {
+                    var transactions = new Transaction[]
+                    {
+                        new Transaction {AccountId= account1.Id, Amount = 30000, Date= DateTime.Now.AddHours(-5), Description = "Transferencia recibida", Type = TransactionType.CREDIT},
+                        new Transaction {AccountId = account1.Id,Amount = 100, Date = DateTime.Now.AddHours(-3), Description = "Compra en tienda xxxx", Type = TransactionType.DEBIT},
+                        new Transaction {AccountId= account1.Id, Amount = 55000, Date= DateTime.Now.AddHours(-6), Description = "Transferencia recibida", Type = TransactionType.CREDIT},
+                        new Transaction {AccountId= account1.Id, Amount = 27000, Date= DateTime.Now.AddHours(-4), Description = "Compra en ML", Type = TransactionType.CREDIT}
+                    };
+                    context.Transactions.AddRange(transactions);
+                    context.SaveChanges();
+                }
             }
         }
     }

@@ -1,5 +1,6 @@
 using HomeBankingMinHub.Models;
 using HomeBankingMinHub.Repositories;
+using HomeBankingMinHub.Repositories.Implementations;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,7 +17,7 @@ builder.Services.AddDbContext<HomeBankingContext>(
 
 //agrego un contexto
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
-
+builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
 var app = builder.Build();
 

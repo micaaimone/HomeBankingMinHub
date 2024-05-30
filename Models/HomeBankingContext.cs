@@ -14,5 +14,7 @@ namespace HomeBankingMinHub.Models
         public DbSet<Client> Clientes { get; set; }
 
         public DbSet<Account> Accounts { get; set; }
+
+        public DbSet<Transaction> Transactions { get; set; }
     }
 }

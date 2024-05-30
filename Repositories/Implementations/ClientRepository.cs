@@ -1,7 +1,7 @@
 ﻿using HomeBankingMinHub.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace HomeBankingMinHub.Repositories
+namespace HomeBankingMinHub.Repositories.Implementations
 {
     public class ClientRepository : RepositoryBase<Client>, IClientRepository
     {

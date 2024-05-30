@@ -32,11 +32,8 @@ namespace HomeBankingMinHub.Controllers
                 return Ok(clientsDTO);
             }
             catch (Exception ex)
-
             {
-
                 return StatusCode(500, ex.Message);
-
             }
         }
 
@@ -50,11 +47,8 @@ namespace HomeBankingMinHub.Controllers
                 return Ok(clientDTO);
             }
             catch (Exception ex)
-
             {
-
                 return StatusCode(500, ex.Message);
-
             }
         }
     }

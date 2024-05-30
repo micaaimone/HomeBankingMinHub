@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using System.Linq.Expressions;
 
-namespace HomeBankingMinHub.Repositories
+namespace HomeBankingMinHub.Repositories.Implementations
 {
     public class RepositoryBase<T> : IRepositoryBase<T> where T : class
     {
@@ -13,18 +13,18 @@ namespace HomeBankingMinHub.Repositories
         {
             this.RepositoryContext = RepositoryContext;
         }
-       
+
 
         public IQueryable<T> FindAll()
         {
-            return this.RepositoryContext
+            return RepositoryContext
                 .Set<T>()
                 .AsNoTrackingWithIdentityResolution();
         }
 
         public IQueryable<T> FindAll(Func<IQueryable<T>, IIncludableQueryable<T, object>> includes = null)
         {
-            IQueryable<T> queryable = this.RepositoryContext.Set<T>();
+            IQueryable<T> queryable = RepositoryContext.Set<T>();
 
             if (includes != null)
             {
@@ -35,7 +35,7 @@ namespace HomeBankingMinHub.Repositories
 
         public IQueryable<T> FindByCondition(Expression<Func<T, bool>> expression)
         {
-            return this.RepositoryContext
+            return RepositoryContext
                 .Set<T>()
                 .Where(expression)
                 .AsNoTrackingWithIdentityResolution();
@@ -43,22 +43,22 @@ namespace HomeBankingMinHub.Repositories
 
         public void Create(T entity)
         {
-            this.RepositoryContext.Set<T>().Add(entity);
+            RepositoryContext.Set<T>().Add(entity);
         }
 
         public void Delete(T entity)
         {
-            this.RepositoryContext.Set<T>().Remove(entity);
+            RepositoryContext.Set<T>().Remove(entity);
         }
 
         public void SaveChanges()
         {
-            this.RepositoryContext.SaveChanges();
+            RepositoryContext.SaveChanges();
         }
 
         public void Update(T entity)
         {
-            this.RepositoryContext.Set<T>().Update(entity);
+            RepositoryContext.Set<T>().Update(entity);
         }
     }
 }

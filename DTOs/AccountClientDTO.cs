@@ -2,7 +2,7 @@
 
 namespace HomeBankingMinHub.DTOs
 {
-    public class AccountDTO
+    public class AccountClientDTO
     {
         public long Id { get; set; }
 
@@ -12,15 +12,12 @@ namespace HomeBankingMinHub.DTOs
 
         public double Balance { get; set; }
 
-        public ICollection<TransactionDTO> Transactions { get; set; }
-
-        public AccountDTO(Account account)
+        public AccountClientDTO(Account account)
         {
             Id = account.Id;
-            Number = account.Number;   
-            CreationDate = account.CreationDate;   
+            Number = account.Number;
+            CreationDate = account.CreationDate;
             Balance = account.Balance;
-            Transactions = account.Transactions.Select(a => new TransactionDTO(a)).ToList();
         }
     }
 }
