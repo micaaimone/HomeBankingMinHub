@@ -1,4 +1,5 @@
 ﻿using HomeBankingMinHub.DTOs;
+using HomeBankingMinHub.Models;
 using HomeBankingMinHub.Repositories;
 using Microsoft.AspNetCore.Mvc;
 
@@ -27,6 +28,7 @@ namespace HomeBankingMinHub.Controllers
             {
                 var account = _accountRepository.FindAccountById(id);
                 var accountDTO = new AccountDTO(account);
+
                 return Ok(accountDTO);
             }
             catch (Exception ex)

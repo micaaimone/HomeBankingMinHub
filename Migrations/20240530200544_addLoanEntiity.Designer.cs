@@ -4,6 +4,7 @@ using HomeBankingMinHub.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace HomeBankingMinHub.Migrations
 {
     [DbContext(typeof(HomeBankingContext))]
-    partial class HomeBankingContextModelSnapshot : ModelSnapshot
+    [Migration("20240530200544_addLoanEntiity")]
+    partial class addLoanEntiity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,9 +85,6 @@ namespace HomeBankingMinHub.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<long?>("AccountId")
-                        .HasColumnType("bigint");
-
                     b.Property<double>("Amount")
                         .HasColumnType("float");
 
@@ -98,8 +98,6 @@ namespace HomeBankingMinHub.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
 
                     b.HasIndex("ClientId");
 
@@ -173,10 +171,6 @@ namespace HomeBankingMinHub.Migrations
 
             modelBuilder.Entity("HomeBankingMinHub.Models.ClientLoan", b =>
                 {
-                    b.HasOne("HomeBankingMinHub.Models.Account", null)
-                        .WithMany("Loans")
-                        .HasForeignKey("AccountId");
-
                     b.HasOne("HomeBankingMinHub.Models.Client", "Client")
                         .WithMany("ClientLoans")
                         .HasForeignKey("ClientId")
@@ -207,8 +201,6 @@ namespace HomeBankingMinHub.Migrations
 
             modelBuilder.Entity("HomeBankingMinHub.Models.Account", b =>
                 {
-                    b.Navigation("Loans");
-
                     b.Navigation("Transactions");
                 });
 

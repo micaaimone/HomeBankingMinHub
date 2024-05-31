@@ -10,8 +10,10 @@ namespace HomeBankingMinHub.DTOs
         public string Email { get; set; }
         public string Password { get; set; }
         public ICollection<AccountClientDTO> Accounts { get; set; }
+        public ICollection<ClientLoanDTO> Loans { get; set; }
 
-       
+
+
         public ClientDTO(Client client)
         {
             FirstName = client.FirstName;
@@ -19,6 +21,7 @@ namespace HomeBankingMinHub.DTOs
             Email = client.Email;
             Password = client.Password;
             Accounts = client.Accounts.Select(a => new AccountClientDTO(a)).ToList();
+            Loans = client.ClientLoans.Select(c => new ClientLoanDTO(c)).ToList();
         }
     }
 }

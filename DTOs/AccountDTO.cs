@@ -14,6 +14,7 @@ namespace HomeBankingMinHub.DTOs
 
         public ICollection<TransactionDTO> Transactions { get; set; }
 
+
         public AccountDTO(Account account)
         {
             Id = account.Id;
@@ -21,6 +22,6 @@ namespace HomeBankingMinHub.DTOs
             CreationDate = account.CreationDate;   
             Balance = account.Balance;
             Transactions = account.Transactions.Select(a => new TransactionDTO(a)).ToList();
-        }
     }
+}
 }
