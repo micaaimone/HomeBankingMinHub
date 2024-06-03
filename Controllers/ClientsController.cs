@@ -43,6 +43,10 @@ namespace HomeBankingMinHub.Controllers
             try
             {
                 var client = _clientRepository.FindById(id);
+                if (client == null)
+                {
+                    return Forbid();
+                } 
                 var clientDTO = new ClientDTO(client);
                 return Ok(clientDTO);
             }
