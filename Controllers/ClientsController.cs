@@ -21,9 +21,11 @@ namespace HomeBankingMinHub.Controllers
         }
 
         [HttpGet]
+        [Authorize(Policy = "AdminOnly")]
 
         public IActionResult GetAllClients()
         {
+
             try
             {
                 var clients = _clientRepository.GetAllClients();
@@ -39,6 +41,8 @@ namespace HomeBankingMinHub.Controllers
         }
 
         [HttpGet("{id}")]
+        [Authorize(Policy = "AdminOnly")]
+
         public IActionResult GetClientsById(long id)
         {
             try

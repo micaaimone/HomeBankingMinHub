@@ -36,12 +36,19 @@ namespace HomeBankingMinHub.Controllers
                 if(!String.Equals(user.Password, clientLoginDTO.Password))
                     return StatusCode(403, "Invalid credentials");
 
+                
+
                 //creo la claim (informacion extra que puedo agregar dentro de una cookie)
                 var claims = new List<Claim>
                 {
                     //clave, valor
                     new Claim("Client", user.Email),
                 };
+
+                if (user.Email == "mica@gmail.com")
+                {
+                    claims.Add(new Claim("Admin", "true"));
+                }
 
                 //definimos una identidad de usuario, esta es la identidad y las reclamaciones 
                 var claimsIdentity = new ClaimsIdentity(
