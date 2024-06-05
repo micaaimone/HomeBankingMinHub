@@ -2,6 +2,7 @@
 {
     public class DbInitializer
     {
+        //static permite usar la clase sin inicializarla
         public static void Initialize(HomeBankingContext context)
         {
             if (!context.Clientes.Any())

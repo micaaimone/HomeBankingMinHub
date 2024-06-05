@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace HomeBankingMinHub.Repositories
 {
-    //T es un generico
+    //recibe un tipo T q es un generico
     public interface IRepositoryBase <T>
     {
         IQueryable<T> FindAll();

@@ -8,6 +8,7 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace HomeBankingMinHub.Controllers
 {
+    //es como un mensajero, recibe una peticion y responde(devuelve algo o no)
     [Route("api/[controller]")]
     [ApiController]
     public class ClientsController : ControllerBase
