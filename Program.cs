@@ -15,7 +15,7 @@ builder.Services.AddDbContext<HomeBankingContext>(
     );
 //con esto mi app ya esta conectada con mi base de datos 
 
-//agrego un contexto
+//agrego al scoped los elementos que necesito que esten a mano
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 
