@@ -22,6 +22,6 @@ namespace HomeBankingMinHub.DTOs
             CreationDate = account.CreationDate;   
             Balance = account.Balance;
             Transactions = account.Transactions.Select(a => new TransactionDTO(a)).ToList();
+        }
     }
-}
 }

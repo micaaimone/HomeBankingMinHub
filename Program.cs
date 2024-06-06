@@ -21,9 +21,10 @@ builder.Services.AddDbContext<HomeBankingContext>(
     );
 //con esto mi app ya esta conectada con mi base de datos 
 
-//agrego contexto
+//agrego inyeccion de dependencia
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ICardRepository, CardRepository>();
 
 //autenticación
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

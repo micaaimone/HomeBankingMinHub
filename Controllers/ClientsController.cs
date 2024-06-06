@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.IdentityModel.Tokens;
+using System.Security.Cryptography;
 
 namespace HomeBankingMinHub.Controllers
 {
@@ -15,15 +16,21 @@ namespace HomeBankingMinHub.Controllers
     {
         //inyectamos repositorio
         private readonly IClientRepository _clientRepository;
+        private readonly IAccountRepository _accountRepository;
+        private readonly ICardRepository _cardRepository;
+
         //constructor
-        public ClientsController(IClientRepository clientRepository)
+        public ClientsController(IClientRepository clientRepository, IAccountRepository accountRepository, ICardRepository cardRepository)
         {
             _clientRepository = clientRepository;
+            _accountRepository = accountRepository;
+            _cardRepository = cardRepository;
         }
 
         [HttpGet]
         [Authorize(Policy = "AdminOnly")]
 
+        //traer todos los clientes 
         public IActionResult GetAllClients()
         {
 
@@ -44,6 +51,7 @@ namespace HomeBankingMinHub.Controllers
         [HttpGet("{id}")]
         [Authorize(Policy = "AdminOnly")]
 
+        //traer a un cliente mediante su id
         public IActionResult GetClientsById(long id)
         {
             try
@@ -52,7 +60,7 @@ namespace HomeBankingMinHub.Controllers
                 if (client == null)
                 {
                     return Forbid();
-                } 
+                }
                 var clientDTO = new ClientDTO(client);
                 return Ok(clientDTO);
             }
@@ -64,6 +72,7 @@ namespace HomeBankingMinHub.Controllers
 
         [HttpGet("current")]
         [Authorize(Policy = "ClientOnly")]
+        //validar datos de un cliente 
         public IActionResult GetCurrent()
         {
             try
@@ -90,6 +99,7 @@ namespace HomeBankingMinHub.Controllers
         }
 
         [HttpPost]
+        //crear un nuevo cliente
         public IActionResult Post([FromBody] NewClientDTO newClientDTO)
         {
             try
@@ -112,6 +122,27 @@ namespace HomeBankingMinHub.Controllers
                 };
 
                 _clientRepository.Save(newClient);
+
+                //para crear su cuenta creo un user2 
+                Client user2 = _clientRepository.FindByEmail(newClientDTO.Email);
+
+                string numberRandom = "";
+                //condicion de corte es cuando el nrRandom no exista
+                do
+                {
+                    numberRandom = "VIN-" + RandomNumberGenerator.GetInt32(0, 99999999);
+                } while (_accountRepository.GetAccountByNumber(numberRandom) != null);
+
+                Account newAccount = new Account
+                {
+                    Balance = 0,
+                    Number = numberRandom,
+                    CreationDate = DateTime.Now,
+                    ClientId = user2.Id
+                };
+
+                _accountRepository.Save(newAccount);
+
                 return StatusCode(201, newClient);
 
             }
@@ -119,6 +150,164 @@ namespace HomeBankingMinHub.Controllers
             {
                 return StatusCode(500, ex.Message);
             }
+        }
+
+        //esto dsps va a service
+        public Client GetCurrentClient()
+        {
+            string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
+            if (email.IsNullOrEmpty())
+                throw new Exception("User not found");
+
+            return _clientRepository.FindByEmail(email);
+
+        }
+
+
+
+        [HttpPost("current/accounts")]
+        [Authorize(Policy = "ClientOnly")]
+        //crearle una cuenta a un cliente autenticado
+        public IActionResult CreateAccountToClientAuthenticated()
+        {
+            try
+            {
+                //traigo al cliente autenticado 
+                Client clientAuthenticated = GetCurrentClient();
+
+                //verificar que mi cliente tenga menos de 3 cuentas 
+
+
+                //esto dsps va a service
+                var accountsClient = clientAuthenticated.Accounts.Count();
+
+                if (accountsClient < 3)
+                {
+                    string numberRandom = "";
+                    //condicion de corte es cuando el nrRandom no exista
+                    do
+                    {
+                        numberRandom = "VIN-" + RandomNumberGenerator.GetInt32(0, 99999999);
+                    } while (_accountRepository.GetAccountByNumber(numberRandom) != null);
+
+                    Account newAccount = new Account
+                    {
+                        Balance = 0,
+                        Number = numberRandom,
+                        CreationDate = DateTime.Now,
+                        ClientId = clientAuthenticated.Id
+                    };
+
+                    _accountRepository.Save(newAccount);
+                    return StatusCode(201, "Account created");
+                } else
+                {
+                    return StatusCode(403, "prohibido");
+                }
+
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+            }
+        }
+
+
+        //esto dsps se va a service 
+        public string CreateRandomNumberCard(Client client)
+        {
+            string newNumberCard = "";
+            do
+            {
+                for (int i = 0; i < 4; i++)
+                {
+                    newNumberCard = newNumberCard + RandomNumberGenerator.GetInt32(1000, 9999);
+
+                    if (i<3)
+                    {
+                        newNumberCard += "-";
+                    }
+                }
+            } while (_cardRepository.GetCardByNumber(client.Id, newNumberCard) != null);
+            
+            return newNumberCard;
+        }
+
+        //esto dsps se va a service 
+        public int CreateRandomCVV()
+        {
+            return RandomNumberGenerator.GetInt32(100, 999);
+        }
+
+        [HttpPost("current/cards")]
+        [Authorize(Policy = "ClientOnly")]
+
+        //crear una nueva tarjeta para un cliente autenticado
+        public IActionResult CreateANewCardForClientAuthenticated([FromBody] NewCardDTO newCardDTO)
+        {
+            try
+            {
+                //traigo al cliente autenticado 
+                Client clientAuthenticated = GetCurrentClient();
+
+                var card = _cardRepository.GetAllCardsByType(clientAuthenticated.Id, newCardDTO.Type);
+
+                if (card.Count() < 3)
+                {
+                    if (card.Any(c => c.Color == newCardDTO.Color))
+                    {
+                        return StatusCode(403, "prohibido, ya tiene ese color de tarjeta");
+                    } else
+                    {
+
+                        Card newCard = new Card
+                        {
+                            ClientId = clientAuthenticated.Id,
+                            CardHolder = clientAuthenticated.FirstName + " " + clientAuthenticated.LastName,
+                            Type = newCardDTO.Type,
+                            Color = newCardDTO.Color,
+                            Number = CreateRandomNumberCard(clientAuthenticated),
+                            Cvv = CreateRandomCVV(),
+                            FromDate = DateTime.Now,
+                            ThruDate = DateTime.Now.AddYears(5),
+                        };
+                        _cardRepository.AddCard(newCard);
+                    }
+                    return StatusCode(201, "Card created");
+                }
+                else
+                {
+                    return StatusCode(403, "prohibido, ya tiene la maxima cantidad de tarjetas");
+                }
+            } catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+
+            }
+
+        }
+
+        [HttpGet("current/cards")]
+        [Authorize(Policy = "ClientOnly")]
+        //traer todas las cards de mi cliente 
+
+        public IActionResult GetAllCardsClient()
+        {
+            try
+            {
+                Client clientCurrent = GetCurrentClient();
+
+                var cardsByClient = _cardRepository.GetAllCardsByClient(clientCurrent.Id);
+
+                var cardDTO = cardsByClient.Select(c => new CardDTO(c)).ToList();
+
+                return Ok(cardDTO);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, ex.Message);
+
+            }
+
         }
     }
 }

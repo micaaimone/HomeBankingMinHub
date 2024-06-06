@@ -8,8 +8,12 @@ namespace HomeBankingMinHub.Repositories
 
         Account FindAccountById(long id);
 
+        Account GetAccountByNumber (string number);
+
         void Save(Account account);
 
         IEnumerable<Account> GetAccountsByClient(long clientId);
+
+
     }
 }

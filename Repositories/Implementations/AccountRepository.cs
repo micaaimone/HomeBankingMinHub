@@ -18,6 +18,11 @@ namespace HomeBankingMinHub.Repositories.Implementations
                 .FirstOrDefault();
         }
 
+        public Account GetAccountByNumber(string number)
+        {
+            return FindByCondition(n => n.Number == number).FirstOrDefault();
+        }
+
         public IEnumerable<Account> GetAccountsByClient(long clientId)
         {
             return FindByCondition(a => a.ClientId == clientId)
