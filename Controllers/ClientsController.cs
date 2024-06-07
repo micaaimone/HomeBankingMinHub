@@ -1,4 +1,6 @@
-﻿using HomeBankingMinHub.DTOs;
+﻿
+
+using HomeBankingMinHub.DTOs;
 using HomeBankingMinHub.Models;
 using HomeBankingMinHub.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -152,18 +154,17 @@ namespace HomeBankingMinHub.Controllers
             }
         }
 
+        
         //esto dsps va a service
-        public Client GetCurrentClient()
+        private Client GetCurrentClient()
         {
             string email = User.FindFirst("Client") != null ? User.FindFirst("Client").Value : string.Empty;
             if (email.IsNullOrEmpty())
                 throw new Exception("User not found");
 
             return _clientRepository.FindByEmail(email);
-
         }
-
-
+        
 
         [HttpPost("current/accounts")]
         [Authorize(Policy = "ClientOnly")]
@@ -211,9 +212,31 @@ namespace HomeBankingMinHub.Controllers
             }
         }
 
+        //Traer todas las cuentas del cliente autenticado - JSON con las cuentas de un cliente
+        [HttpGet("current/accounts")]
+        [Authorize(Policy = "ClientOnly")]
+        public IActionResult GetAllAccountsByClient()
+        {
+            try
+            {
+                
+                Client clientAuthenticated = GetCurrentClient();
 
+                var accountsByClient = _accountRepository.GetAccountsByClient(clientAuthenticated.Id);
+
+                var accountsDTO = accountsByClient.Select(a => new AccountClientDTO(a)).ToList();
+
+                return Ok(accountsDTO);
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500, e.Message);
+            }
+        }
+
+        
         //esto dsps se va a service 
-        public string CreateRandomNumberCard(Client client)
+        private string CreateRandomNumberCard(Client client)
         {
             string newNumberCard = "";
             do
@@ -233,10 +256,11 @@ namespace HomeBankingMinHub.Controllers
         }
 
         //esto dsps se va a service 
-        public int CreateRandomCVV()
+        private int CreateRandomCVV()
         {
             return RandomNumberGenerator.GetInt32(100, 999);
         }
+        
 
         [HttpPost("current/cards")]
         [Authorize(Policy = "ClientOnly")]

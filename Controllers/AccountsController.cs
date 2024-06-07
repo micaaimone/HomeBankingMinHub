@@ -15,7 +15,6 @@ namespace HomeBankingMinHub.Controllers
         public AccountsController(IAccountRepository accountRepository)
 
         {
-
             _accountRepository = accountRepository;
 
         }
