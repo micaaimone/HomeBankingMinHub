@@ -24,6 +24,7 @@ builder.Services.AddDbContext<HomeBankingContext>(
 //agrego inyeccion de dependencia
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
+builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
 builder.Services.AddScoped<ICardRepository, CardRepository>();
 
 //autenticación

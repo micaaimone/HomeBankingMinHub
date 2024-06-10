@@ -1,6 +1,4 @@
-﻿
-
-using HomeBankingMinHub.DTOs;
+﻿using HomeBankingMinHub.DTOs;
 using HomeBankingMinHub.Models;
 using HomeBankingMinHub.Repositories;
 using Microsoft.AspNetCore.Authorization;
@@ -177,7 +175,6 @@ namespace HomeBankingMinHub.Controllers
                 Client clientAuthenticated = GetCurrentClient();
 
                 //verificar que mi cliente tenga menos de 3 cuentas 
-
 
                 //esto dsps va a service
                 var accountsClient = clientAuthenticated.Accounts.Count();

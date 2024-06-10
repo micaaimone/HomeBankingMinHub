@@ -18,6 +18,15 @@ namespace HomeBankingMinHub.Repositories.Implementations
                 .FirstOrDefault();
         }
 
+        //con este agarro las transacciones 
+        public Account FindByNumber(string number)
+        {
+            return FindByCondition(account => account.Number.ToUpper() == number.ToUpper())
+                       .Include(account => account.Transactions)
+                       .FirstOrDefault();
+        }
+
+        //con este agarro la cuenta en si 
         public Account GetAccountByNumber(string number)
         {
             return FindByCondition(n => n.Number == number).FirstOrDefault();
@@ -39,6 +48,14 @@ namespace HomeBankingMinHub.Repositories.Implementations
         {
             Create(account);
             SaveChanges();
+        }
+
+        public void UpdateAccount(Account account)
+        {
+            Update(account);
+            SaveChanges();
+            //lo hacemos para que no se quede en cache esperando mas datos
+            RepositoryContext.ChangeTracker.Clear();
         }
     }
 }

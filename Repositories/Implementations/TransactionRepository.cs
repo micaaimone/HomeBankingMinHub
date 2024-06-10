@@ -16,11 +16,17 @@ namespace HomeBankingMinHub.Repositories.Implementations
             return FindAll().Include(t => t.Amount).ToList();
         }
 
-        public Transaction GetTransaction(int id)
+        public Transaction GetTransactionById(int id)
         {
             return FindByCondition(t => t.Id == id)
-                .Include(t => t.Amount)
-                .FirstOrDefault();   
+                            .Include(t => t.Amount)
+                            .FirstOrDefault();
+        }
+
+        public void Save(Transaction transaction)
+        {
+            Create(transaction);
+            SaveChanges();
         }
     }
 }

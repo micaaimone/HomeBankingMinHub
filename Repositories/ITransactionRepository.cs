@@ -6,6 +6,9 @@ namespace HomeBankingMinHub.Repositories
     {
         IEnumerable<Transaction> GetAllTransactions();
 
-        Transaction GetTransaction(int id);
+        Transaction GetTransactionById(int id);
+
+        void Save(Transaction transaction);
+
     }
 }
