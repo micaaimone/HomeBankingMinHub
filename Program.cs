@@ -21,7 +21,8 @@ builder.Services.AddDbContext<HomeBankingContext>(
     );
 //con esto mi app ya esta conectada con mi base de datos 
 
-//agrego inyeccion de dependencia
+//agrego implementaciones de repositorios al contenedor de servicios usando la inyección de dependencias.
+//addScoped asegura que haya una única instancia de cada repositorio por solicitud HTTP.
 builder.Services.AddScoped<IClientRepository, ClientRepository>();
 builder.Services.AddScoped<IAccountRepository, AccountRepository>();
 builder.Services.AddScoped<ITransactionRepository, TransactionRepository>();
@@ -29,7 +30,8 @@ builder.Services.AddScoped<ICardRepository, CardRepository>();
 builder.Services.AddScoped<ILoanRepository, LoanRepository>();
 builder.Services.AddScoped<IClientLoanRepository, ClientLoanRepository>();
 
-//autenticación
+//autenticación basada en cookies
+//las cookies expiran después de 10 minutos y el usuario es redirigido a /index.html para iniciar sesión si no está autenticado.
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
       .AddCookie(options =>
       {
@@ -37,7 +39,7 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
           options.LoginPath = new PathString("/index.html");
       });
 
-//autorización aca configuramos la politica para q la persona acceda a nuestro backend
+//autorización aca configuramos la politica q necesitan los claims para q la persona acceda a nuestro backend
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("ClientOnly", policy => policy.RequireClaim("Client"));

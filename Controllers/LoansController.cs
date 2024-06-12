@@ -35,18 +35,34 @@ namespace HomeBanking.Controllers
             _accountRepository = accountRepository;
             _transactionRepository = transactionRepository;
         }
-
-        [ApiExplorerSettings(IgnoreApi = true)]
-        public Client GetCurrentClient()
+        private Client GetCurrentClient()
         {
-            string email = User.FindFirst(ClaimTypes.Email)?.Value ?? string.Empty;
-            if (string.IsNullOrEmpty(email))
+            try
             {
-                throw new Exception("Usuario no encontrado");
-            }
+                // Obtener el claim de email del usuario
+                string email = User.FindFirst("Client")?.Value ?? string.Empty;
+                if (string.IsNullOrEmpty(email))
+                {
+                    throw new UnauthorizedAccessException("Usuario no encontrado o no autenticado");
+                }
 
-            return _clientRepository.FindByEmail(email);
+                // Buscar el cliente por email
+                Client client = _clientRepository.FindByEmail(email);
+                if (client == null)
+                {
+                    throw new UnauthorizedAccessException("Cliente no encontrado");
+                }
+
+                return client;
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error al obtener el cliente: " + ex.Message);
+            }
         }
+
+
+    
 
         // GET /api/loans
         [HttpGet]
@@ -55,8 +71,12 @@ namespace HomeBanking.Controllers
         {
             try
             {
+                //verificamos cliente
                 Client clientCurrent = GetCurrentClient();
-                return Ok(_loanRepository);
+                //obtenemos sus loans
+                var loans = _loanRepository.GetAll();
+                var loansDTO = loans.Select(l => new LoanDTO(l)).ToList();
+                return Ok(loansDTO);
             }
             catch (Exception e)
             {
@@ -69,20 +89,7 @@ namespace HomeBanking.Controllers
         [Authorize(Policy = "ClientOnly")]
         public IActionResult CreateLoan(LoanApplicationDTO loanApplicationDTO)
         {
-            try
-            {
-                Client clientCurrent = GetCurrentClient();
-                AsignLoanToClient(loanApplicationDTO, clientCurrent);
-                return Ok("Loan assigned successfully");
-            }
-            catch (Exception e)
-            {
-                return StatusCode(500, e.Message);
-            }
-        }
-
-        public IActionResult AsignLoanToClient(LoanApplicationDTO loanApplicationDTO, Client client)
-        {
+            Client client = GetCurrentClient();
             try
             {
                 // Verificar que el préstamo seleccionado exista
@@ -134,7 +141,7 @@ namespace HomeBanking.Controllers
                 {
                     Type = TransactionType.CREDIT,
                     Amount = loanApplicationDTO.Amount,
-                    Description = loanFinded.Name + "- Loan approved",
+                    Description = loanFinded.Name + "- Loan aprobada",
                     Date = DateTime.Now,
                     AccountId = accountFinded.Id
                 };
